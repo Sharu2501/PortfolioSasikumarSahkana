@@ -87,7 +87,29 @@ document.addEventListener("DOMContentLoaded", () => {
     🔗 <b>LinkedIn :</b> <a href='https://www.linkedin.com/in/sahkana-sasikumar' class='link' target='_blank'>linkedin.com/in/sahkana-sasikumar</a>`
   };
 
+  let currentSuggestion = '';
+  let suggestions = [];
+
+  inputSpan.addEventListener("input", function(event) {
+    const inputText = inputSpan.innerText.trim().toLowerCase();
+
+    suggestions = Object.keys(commands).filter(cmd => cmd.startsWith(inputText));
+
+    if (suggestions.length > 0) {
+      currentSuggestion = suggestions[0];
+      showSuggestions(currentSuggestion);
+    } else {
+      hideSuggestions();
+    }
+  });
+
   inputSpan.addEventListener("keydown", function(event) {
+    if (event.key === "Tab" && currentSuggestion) {
+      event.preventDefault();
+      inputSpan.innerText = currentSuggestion;
+      hideSuggestions();
+    }
+
     if (event.key === "Enter") {
       event.preventDefault();
       let command = inputSpan.innerText.trim().toLowerCase();
@@ -111,6 +133,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+function showSuggestions(suggestion) {
+  let suggestionBox = document.getElementById("suggestion-box");
+  if (!suggestionBox) {
+    suggestionBox = document.createElement("div");
+    suggestionBox.id = "suggestion-box";
+    suggestionBox.style.position = "absolute";
+    suggestionBox.style.top = `${inputSpan.offsetTop + inputSpan.offsetHeight}px`;
+    suggestionBox.style.left = `${inputSpan.offsetLeft}px`;
+    suggestionBox.style.backgroundColor = "white";
+    suggestionBox.style.border = "1px solid #ccc";
+    suggestionBox.style.padding = "5px";
+    suggestionBox.style.width = "auto";
+    document.body.appendChild(suggestionBox);
+  }
+  suggestionBox.innerHTML = `Suggestion : <span class='cmd'>${suggestion}</span>`;
+}
+
+function hideSuggestions() {
+  let suggestionBox = document.getElementById("suggestion-box");
+  if (suggestionBox) {
+    suggestionBox.remove();
+  }
+}
 
 function typeEffect(element, text, speed) {
   let i = 0;
